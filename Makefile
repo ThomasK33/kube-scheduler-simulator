@@ -31,11 +31,11 @@ build:
 docker_build: docker_build_server docker_build_front
 
 .PHONY: docker_build_server
-docker_build_server: 
+docker_build_server:
 	docker build -t simulator-server ./simulator/
 
 .PHONY: docker_build_front
-docker_build_front: 
+docker_build_front:
 	docker build -t simulator-frontend ./web/
 
 .PHONY: docker_up

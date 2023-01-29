@@ -5,6 +5,8 @@ import (
 	"k8s.io/kube-scheduler/config/v1beta2"
 	"k8s.io/kubernetes/pkg/scheduler/framework/plugins"
 	"k8s.io/kubernetes/pkg/scheduler/framework/runtime"
+
+	"sigs.k8s.io/kube-scheduler-simulator/simulator/scheduler/plugin/networkbandwidth"
 )
 
 // RegisteredPreScorePlugins returns all registered plugins.
@@ -212,6 +214,9 @@ func InTreeFilterPluginSet() (v1beta2.PluginSet, error) {
 func OutOfTreeFilterPlugins() []v1beta2.Plugin {
 	return []v1beta2.Plugin{
 		// Note: add your filter plugins here.
+		{
+			Name: networkbandwidth.Name,
+		},
 	}
 }
 
@@ -261,6 +266,9 @@ func InTreeScorePluginSet() (v1beta2.PluginSet, error) {
 func OutOfTreeScorePlugins() []v1beta2.Plugin {
 	return []v1beta2.Plugin{
 		// Note: add your score plugins here.
+		{
+			Name: networkbandwidth.Name,
+		},
 	}
 }
 
@@ -271,5 +279,6 @@ func InTreeRegistries() runtime.Registry {
 func OutOfTreeRegistries() runtime.Registry {
 	return runtime.Registry{
 		// Note: add your plugins registries here.
+		networkbandwidth.Name: networkbandwidth.New,
 	}
 }
