@@ -17,6 +17,9 @@ import (
 
 const (
 	Name = "NetworkBandwidth"
+
+	IngressBandwidthAnnotation = "kubernetes.io/ingress-bandwidth"
+	EgressBandwidthAnnotation  = "kubernetes.io/egress-bandwidth"
 )
 
 var (
@@ -61,14 +64,24 @@ func (n *NetworkBandwidth) Filter(ctx context.Context, state *framework.CycleSta
 
 	// Obtain the pod's network requests
 	podRequests := resource.NewQuantity(0, resource.DecimalSI)
-	if ingressAnnotation, ok := pod.Annotations[n.args.IngressRequestAnnotation]; ok {
+
+	ingressAnnotation, ok := pod.Annotations[n.args.IngressRequestAnnotation]
+	if !ok {
+		ingressAnnotation, ok = pod.Annotations[IngressBandwidthAnnotation]
+	}
+	if ok {
 		ingressRequest, err := resource.ParseQuantity(ingressAnnotation)
 		if err != nil {
 			return framework.NewStatus(framework.Error, fmt.Sprintf("Could not parse quantity from pod %v %v annotations", pod.Name, n.args.IngressRequestAnnotation))
 		}
 		podRequests.Add(ingressRequest)
 	}
-	if requestAnnotation, ok := pod.Annotations[n.args.EgressRequestAnnotation]; ok {
+
+	requestAnnotation, ok := pod.Annotations[n.args.EgressRequestAnnotation]
+	if !ok {
+		requestAnnotation, ok = pod.Annotations[EgressBandwidthAnnotation]
+	}
+	if ok {
 		egressRequest, err := resource.ParseQuantity(requestAnnotation)
 		if err != nil {
 			return framework.NewStatus(framework.Error, fmt.Sprintf("Could not parse quantity from pod %v %v annotations", pod.Name, n.args.EgressRequestAnnotation))
